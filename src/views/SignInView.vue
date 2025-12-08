@@ -42,7 +42,7 @@
             <input type="checkbox" id="remember" v-model="rememberMe">
             <label for="remember">로그인 정보 저장</label>
           </div>
-          <a href="#" class="need-help">도움이 필요하신가요?</a>
+          <span class="need-help">도움이 필요하신가요?</span>
         </div>
       </form>
 
@@ -71,9 +71,10 @@ const password = ref('');
 const confirmPassword = ref('');
 const rememberMe = ref(false);
 
-// 모드 전환 함수 (애니메이션 효과를 위해 상태 변경)
+// 모드 전환 함수
 const toggleMode = () => {
   isLoginMode.value = !isLoginMode.value;
+  // 입력 필드 초기화
   email.value = '';
   password.value = '';
   confirmPassword.value = '';
@@ -90,7 +91,7 @@ const handleSubmit = () => {
 
 // 로그인 로직
 const handleLogin = () => {
-  // 1. 로컬 스토리지에서 유저 목록 가져오기
+  // 1. 저장된 유저 목록 가져오기
   const users = JSON.parse(localStorage.getItem('users') || '[]');
 
   // 2. 일치하는 유저 찾기
@@ -98,11 +99,14 @@ const handleLogin = () => {
 
   if (user) {
     alert(`${user.email}님 환영합니다!`);
-    // 로그인 상태 저장 (간단한 토큰 역할)
+    // 로그인 상태 저장 (현재 로그인한 유저)
     localStorage.setItem('currentUser', JSON.stringify(user));
-    router.push('/'); // 홈으로 이동
+    // API 키도 저장 (과제 참고 파일 로직 반영)
+    localStorage.setItem('TMDb-Key', user.password);
+
+    router.push('/'); // 홈으로 이동 [cite: 343]
   } else {
-    alert('이메일이나 비밀번호를 확인해주세요.');
+    alert('이메일이나 비밀번호를 확인해주세요.'); [cite: 344]
   }
 };
 
@@ -111,10 +115,6 @@ const handleRegister = () => {
   // 1. 유효성 검사
   if (password.value !== confirmPassword.value) {
     alert('비밀번호가 일치하지 않습니다.');
-    return;
-  }
-  if (!email.value.includes('@')) {
-    alert('올바른 이메일 형식이 아닙니다.');
     return;
   }
 
@@ -127,12 +127,12 @@ const handleRegister = () => {
     return;
   }
 
-  // 3. 저장 (비밀번호는 과제 지침에 따라 API Key로 활용 가능)
+  // 3. 저장
   const newUser = { email: email.value, password: password.value };
   users.push(newUser);
-  localStorage.setItem('users', JSON.stringify(users)); // DB 업데이트
+  localStorage.setItem('users', JSON.stringify(users)); // 로컬 스토리지에 저장
 
-  alert('회원가입 성공! 로그인해주세요.');
+  alert('회원가입 성공! 로그인해주세요.'); [cite: 346]
   toggleMode(); // 로그인 화면으로 전환
 };
 </script>
@@ -142,6 +142,7 @@ const handleRegister = () => {
   position: relative;
   height: 100vh;
   width: 100%;
+  /* 넷플릭스 스타일 배경 이미지 */
   background-image: url('https://assets.nflxext.com/ffe/siteui/vlv3/f841d4c7-10e1-40af-bcae-07a3f8dc141a/f6d7434e-d6de-4185-a6d4-c77a2d08737b/KR-ko-20220502-popsignuptwoweeks-perspective_alpha_website_medium.jpg');
   background-size: cover;
   background-position: center;
@@ -156,7 +157,7 @@ const handleRegister = () => {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* 배경 어둡게 */
+  background: rgba(0, 0, 0, 0.5);
   z-index: 1;
 }
 
@@ -192,7 +193,7 @@ input {
   background: #333;
   color: white;
   font-size: 16px;
-  box-sizing: border-box; /* 패딩 포함 크기 계산 */
+  box-sizing: border-box;
 }
 
 input:focus {
