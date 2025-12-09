@@ -5,7 +5,7 @@
           :src="getImageUrl(movie.poster_path)"
           :alt="movie.title"
           loading="lazy"
-          @click="$emit('toggle-wish', movie)"
+          @click="$router.push(`/movie/${movie.id}`)"
       />
       <div class="wish-indicator" @click.stop="$emit('toggle-wish', movie)">
         {{ isWished ? '❤️' : '🤍' }}
