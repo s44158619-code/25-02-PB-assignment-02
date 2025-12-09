@@ -3,48 +3,54 @@
     <div class="background-overlay"></div>
 
     <div class="login-card">
-      <h1 class="card-title">{{ isLoginMode ? '로그인' : '회원가입' }}</h1>
+      <Transition name="fade-slide" mode="out-in">
+        <div :key="isLoginMode ? 'login' : 'signup'" class="form-container">
 
-      <form @submit.prevent="handleSubmit" class="login-form">
-        <div class="input-group">
-          <input
-              type="email"
-              v-model="email"
-              placeholder="이메일 주소"
-              required
-          />
+          <h1 class="card-title">{{ isLoginMode ? '로그인' : '회원가입' }}</h1>
+
+          <form @submit.prevent="handleSubmit" class="login-form">
+            <div class="input-group">
+              <input
+                  type="email"
+                  v-model="email"
+                  placeholder="이메일 주소"
+                  required
+              />
+            </div>
+
+            <div class="input-group">
+              <input
+                  type="password"
+                  v-model="password"
+                  placeholder="비밀번호 (TMDB API Key)"
+                  required
+              />
+            </div>
+
+            <div class="input-group" v-if="!isLoginMode">
+              <input
+                  type="password"
+                  v-model="confirmPassword"
+                  placeholder="비밀번호 확인"
+                  required
+              />
+            </div>
+
+            <button type="submit" class="submit-btn">
+              {{ isLoginMode ? '로그인' : '회원가입' }}
+            </button>
+
+            <div class="form-help">
+              <div class="remember-me">
+                <input type="checkbox" id="remember" v-model="rememberMe">
+                <label for="remember">로그인 정보 저장</label>
+              </div>
+              <span class="need-help">도움이 필요하신가요?</span>
+            </div>
+          </form>
+
         </div>
-
-        <div class="input-group">
-          <input
-              type="password"
-              v-model="password"
-              placeholder="비밀번호 (TMDB API Key)"
-              required
-          />
-        </div>
-
-        <div class="input-group" v-if="!isLoginMode">
-          <input
-              type="password"
-              v-model="confirmPassword"
-              placeholder="비밀번호 확인"
-              required
-          />
-        </div>
-
-        <button type="submit" class="submit-btn">
-          {{ isLoginMode ? '로그인' : '회원가입' }}
-        </button>
-
-        <div class="form-help">
-          <div class="remember-me">
-            <input type="checkbox" id="remember" v-model="rememberMe">
-            <label for="remember">로그인 정보 저장</label>
-          </div>
-          <span class="need-help">도움이 필요하신가요?</span>
-        </div>
-      </form>
+      </Transition>
 
       <div class="switch-mode">
         <p>
@@ -63,7 +69,7 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const isLoginMode = ref(true);
+const isLoginMode = ref(true); // true: 로그인, false: 회원가입
 
 // 입력 데이터
 const email = ref('');
@@ -97,8 +103,7 @@ const handleLogin = () => {
     alert(`${user.email}님 환영합니다!`);
     localStorage.setItem('currentUser', JSON.stringify(user));
     localStorage.setItem('TMDb-Key', user.password);
-
-    router.push('/'); // 홈으로 이동
+    router.push('/');
   } else {
     alert('이메일이나 비밀번호를 확인해주세요.');
   }
@@ -108,6 +113,10 @@ const handleLogin = () => {
 const handleRegister = () => {
   if (password.value !== confirmPassword.value) {
     alert('비밀번호가 일치하지 않습니다.');
+    return;
+  }
+  if (!email.value.includes('@')) {
+    alert('올바른 이메일 형식이 아닙니다.');
     return;
   }
 
@@ -129,7 +138,6 @@ const handleRegister = () => {
 </script>
 
 <style scoped>
-/* 스타일은 기존과 동일 */
 .signin-container {
   position: relative;
   height: 100vh;
@@ -144,10 +152,7 @@ const handleRegister = () => {
 
 .background-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1;
 }
@@ -161,76 +166,51 @@ const handleRegister = () => {
   width: 100%;
   max-width: 450px;
   min-height: 550px;
+  overflow: hidden; /* 애니메이션 넘침 방지 */
 }
 
 .card-title {
-  color: white;
-  font-size: 32px;
-  font-weight: 700;
-  margin-bottom: 28px;
+  color: white; font-size: 32px; font-weight: 700; margin-bottom: 28px;
 }
 
-.input-group {
-  margin-bottom: 16px;
-}
+.input-group { margin-bottom: 16px; }
 
 input {
-  width: 100%;
-  height: 50px;
-  line-height: 50px;
-  padding: 16px 20px;
-  border: 0;
-  border-radius: 4px;
-  background: #333;
-  color: white;
-  font-size: 16px;
-  box-sizing: border-box;
+  width: 100%; height: 50px; line-height: 50px; padding: 16px 20px;
+  border: 0; border-radius: 4px; background: #333; color: white;
+  font-size: 16px; box-sizing: border-box;
 }
-
-input:focus {
-  outline: none;
-  background: #454545;
-}
+input:focus { outline: none; background: #454545; }
 
 .submit-btn {
-  width: 100%;
-  padding: 16px;
-  font-size: 16px;
-  font-weight: 700;
-  margin-top: 24px;
-  background-color: #E50914;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
+  width: 100%; padding: 16px; font-size: 16px; font-weight: 700;
+  margin-top: 24px; background-color: #E50914; color: white;
+  border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.2s;
 }
-
-.submit-btn:hover {
-  background-color: #f40612;
-}
+.submit-btn:hover { background-color: #f40612; }
 
 .form-help {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-  color: #b3b3b3;
-  font-size: 13px;
+  display: flex; justify-content: space-between; margin-top: 10px;
+  color: #b3b3b3; font-size: 13px;
 }
 
-.switch-mode {
-  margin-top: 40px;
-  color: #737373;
-  font-size: 16px;
+.switch-mode { margin-top: 40px; color: #737373; font-size: 16px; }
+.switch-link { color: white; margin-left: 5px; cursor: pointer; }
+.switch-link:hover { text-decoration: underline; }
+
+/* 🌟 전환 애니메이션 CSS (필수) */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.4s ease;
 }
 
-.switch-link {
-  color: white;
-  margin-left: 5px;
-  cursor: pointer;
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateX(20px); /* 오른쪽에서 스윽 */
 }
 
-.switch-link:hover {
-  text-decoration: underline;
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateX(-20px); /* 왼쪽으로 스윽 */
 }
 </style>
