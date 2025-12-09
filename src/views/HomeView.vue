@@ -7,7 +7,7 @@
         <h1 class="banner-title">{{ bannerMovie.title }}</h1>
         <div class="banner-buttons">
           <button class="banner-button play">▶ 재생</button>
-          <button class="banner-button info">상세 정보</button>
+          <button class="banner-button info" @click="toggleWishlist(bannerMovie)">+ 찜하기</button>
         </div>
         <h1 class="banner-description">{{ truncate(bannerMovie.overview, 150) }}</h1>
       </div>
@@ -26,6 +26,7 @@
               :src="getImageUrl(movie.poster_path)"
               :alt="movie.title"
               class="row-poster"
+              @click="toggleWishlist(movie)"
           />
         </div>
       </div>
@@ -43,6 +44,25 @@ const bannerMovie = ref(null);
 // 글자가 너무 길면 ...으로 자르는 함수
 const truncate = (str, n) => {
   return str?.length > n ? str.substr(0, n - 1) + "..." : str;
+};
+
+// 찜하기 기능 (Local Storage 저장)
+const toggleWishlist = (movie) => {
+  if (!movie) return; // 영화 정보가 없으면 중단
+
+  // 기존 찜 목록 불러오기
+  const stored = JSON.parse(localStorage.getItem('myWishlist') || '[]');
+
+  // 이미 찜했는지 확인
+  const exists = stored.find(m => m.id === movie.id);
+
+  if (exists) {
+    alert('이미 찜한 콘텐츠입니다!');
+  } else {
+    stored.push(movie);
+    localStorage.setItem('myWishlist', JSON.stringify(stored));
+    alert('찜 목록에 추가되었습니다! 💖');
+  }
 };
 
 onMounted(async () => {
