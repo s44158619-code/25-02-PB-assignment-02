@@ -8,7 +8,7 @@
           @click="$router.push(`/movie/${movie.id}`)"
       />
       <div class="wish-indicator" @click.stop="$emit('toggle-wish', movie)">
-        {{ isWished ? '❤️' : '🤍' }}
+        <i :class="isWished ? 'fas fa-heart' : 'far fa-heart'"></i>
       </div>
     </div>
     <div class="movie-info">
@@ -76,5 +76,23 @@ const emit = defineEmits(['toggle-wish']);
   overflow: hidden;
   text-overflow: ellipsis; /* 글자 넘치면 ... 처리 */
   padding: 0 2px;
+}
+
+.wish-indicator {
+  position: absolute;
+  top: 8px; right: 8px;
+  font-size: 1.4rem; /* 크기 조절 */
+  color: white; /* 기본 색상 */
+  filter: drop-shadow(0 0 3px rgba(0,0,0,0.8));
+  transition: transform 0.2s;
+}
+
+.wish-indicator:hover {
+  transform: scale(1.2);
+}
+
+/* 찜 했을 때 하트 색상 (빨강) */
+.wish-indicator i.fas.fa-heart {
+  color: #E50914;
 }
 </style>
