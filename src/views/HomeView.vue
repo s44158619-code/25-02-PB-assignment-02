@@ -1,51 +1,64 @@
 ﻿<template>
   <div class="home">
-    <header class="banner" v-if="bannerMovie"
-            :style="{ backgroundImage: `url(${getImageUrl(bannerMovie.backdrop_path, 'original')})` }"
-    >
-      <div class="banner-contents">
-        <h1 class="banner-title">{{ bannerMovie.title }}</h1>
-        <div class="banner-buttons">
-          <button class="banner-button play">▶ 재생</button>
-          <button class="banner-button info" @click="toggleWishlist(bannerMovie)">
-            {{ isWished(bannerMovie) ? '✓ 찜한 콘텐츠' : '+ 찜하기' }}
-          </button>
-        </div>
-        <p class="banner-description">{{ truncate(bannerMovie.overview, 150) }}</p>
-      </div>
-      <div class="banner--fadeBottom"></div>
-    </header>
 
-    <div class="rows-container">
-      <div class="row">
-        <h2>🔥 지금 뜨는 콘텐츠</h2>
-        <div class="row-posters">
-          <MovieCard v-for="movie in popularMovies" :key="movie.id" :movie="movie"
-                     :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+    <div v-if="isLoading" class="loading-skeleton">
+      <div class="skeleton-banner"></div>
+      <div class="skeleton-row-container" v-for="n in 3" :key="n">
+        <div class="skeleton-title"></div>
+        <div class="skeleton-posters">
+          <div class="skeleton-poster" v-for="m in 6" :key="m"></div>
         </div>
       </div>
+    </div>
 
-      <div class="row">
-        <h2>🎬 최신 상영작</h2>
-        <div class="row-posters">
-          <MovieCard v-for="movie in nowPlayingMovies" :key="movie.id" :movie="movie"
-                     :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+    <div v-else>
+      <header class="banner" v-if="bannerMovie"
+              :style="{ backgroundImage: `url(${getImageUrl(bannerMovie.backdrop_path, 'original')})` }"
+      >
+        <div class="banner-contents">
+          <h1 class="banner-title">{{ bannerMovie.title }}</h1>
+          <div class="banner-buttons">
+            <button class="banner-button play">▶ 재생</button>
+            <button class="banner-button info" @click="toggleWishlist(bannerMovie)">
+              {{ isWished(bannerMovie) ? '✓ 찜한 콘텐츠' : '+ 찜하기' }}
+            </button>
+          </div>
+          <p class="banner-description">{{ truncate(bannerMovie.overview, 150) }}</p>
         </div>
-      </div>
+        <div class="banner--fadeBottom"></div>
+      </header>
 
-      <div class="row">
-        <h2>⭐ 평론가 호평 영화</h2>
-        <div class="row-posters">
-          <MovieCard v-for="movie in topRatedMovies" :key="movie.id" :movie="movie"
-                     :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+      <div class="rows-container">
+        <div class="row">
+          <h2>🔥 지금 뜨는 콘텐츠</h2>
+          <div class="row-posters">
+            <MovieCard v-for="movie in popularMovies" :key="movie.id" :movie="movie"
+                       :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+          </div>
         </div>
-      </div>
 
-      <div class="row">
-        <h2>💥 액션 영화</h2>
-        <div class="row-posters">
-          <MovieCard v-for="movie in actionMovies" :key="movie.id" :movie="movie"
-                     :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+        <div class="row">
+          <h2>🎬 최신 상영작</h2>
+          <div class="row-posters">
+            <MovieCard v-for="movie in nowPlayingMovies" :key="movie.id" :movie="movie"
+                       :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+          </div>
+        </div>
+
+        <div class="row">
+          <h2>⭐ 평론가 호평 영화</h2>
+          <div class="row-posters">
+            <MovieCard v-for="movie in topRatedMovies" :key="movie.id" :movie="movie"
+                       :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+          </div>
+        </div>
+
+        <div class="row">
+          <h2>💥 액션 영화</h2>
+          <div class="row-posters">
+            <MovieCard v-for="movie in actionMovies" :key="movie.id" :movie="movie"
+                       :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+          </div>
         </div>
       </div>
     </div>
@@ -63,6 +76,7 @@ const nowPlayingMovies = ref([]);
 const topRatedMovies = ref([]);
 const actionMovies = ref([]);
 const bannerMovie = ref(null);
+const isLoading = ref(true); // 로딩 상태 추가
 
 const { isWished, toggleWishlist, loadWishlist } = useWishlist();
 
@@ -70,7 +84,9 @@ const truncate = (str, n) => str?.length > n ? str.substr(0, n - 1) + "..." : st
 
 onMounted(async () => {
   loadWishlist();
+  isLoading.value = true; // 로딩 시작
   try {
+    // 4개의 API 호출이 다 끝날 때까지 기다림
     const [popRes, nowRes, topRes, actRes] = await Promise.all([
       fetchPopularMovies(),
       fetchNowPlaying(),
@@ -85,6 +101,8 @@ onMounted(async () => {
     bannerMovie.value = popRes.data.results[0];
   } catch (error) {
     console.error("영화 로딩 실패:", error);
+  } finally {
+    isLoading.value = false; // 로딩 끝 (성공하든 실패하든 실행)
   }
 });
 </script>
@@ -104,30 +122,53 @@ onMounted(async () => {
 .banner-button:hover { color: #000; background-color: #e6e6e6; transition: all 0.2s; }
 .banner--fadeBottom { height: 7.4rem; background-image: linear-gradient(180deg, transparent, rgba(20, 20, 20, 0.61), #141414); position: absolute; bottom: 0; width: 100%; }
 
-/* 🌟 영화 목록 스타일 (핵심) */
+/* 영화 목록 스타일 */
 .rows-container {
   position: relative;
   z-index: 20;
-  margin-top: -50px; /* 배너 위로 살짝 올라오게 */
+  margin-top: -50px;
   padding-left: 20px;
 }
 
 .row { margin-bottom: 40px; }
 .row h2 { font-size: 1.4rem; font-weight: bold; margin-bottom: 15px; margin-left: 10px; }
 
-/* 가로 스크롤 컨테이너 */
 .row-posters {
-  display: flex; /* 가로 배치 */
-  flex-wrap: nowrap; /* 줄바꿈 금지 (중요!) */
-  overflow-x: auto; /* 가로 스크롤 허용 */
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
   overflow-y: hidden;
-  gap: 10px; /* 포스터 사이 간격 */
+  gap: 10px;
   padding: 10px;
   scroll-behavior: smooth;
 }
-
-/* 스크롤바 숨기기 (크롬/사파리) */
 .row-posters::-webkit-scrollbar { display: none; }
-/* 스크롤바 숨기기 (파이어폭스) */
 .row-posters { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* 🌟 스켈레톤 로딩 애니메이션 (Fancy Style 점수용) */
+.loading-skeleton { padding: 0; width: 100%; overflow: hidden; }
+
+/* 반짝이는 효과 정의 */
+@keyframes pulse {
+  0% { opacity: 0.3; background-color: #333; }
+  50% { opacity: 0.5; background-color: #444; }
+  100% { opacity: 0.3; background-color: #333; }
+}
+
+.skeleton-banner {
+  width: 100%; height: 500px;
+  margin-bottom: 20px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-row-container { margin: 20px 0 40px 20px; }
+.skeleton-title {
+  width: 200px; height: 30px; margin-bottom: 15px; border-radius: 4px;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+.skeleton-posters { display: flex; gap: 10px; overflow: hidden; }
+.skeleton-poster {
+  width: 160px; height: 240px; border-radius: 4px; flex-shrink: 0;
+  animation: pulse 1.5s infinite ease-in-out;
+}
 </style>
