@@ -167,22 +167,21 @@ onMounted(async () => {
 <style scoped>
 .home { background-color: #141414; min-height: 100vh; color: white; padding-bottom: 50px; }
 
-/* 배너 스타일 수정 (겹침 문제 해결 및 레이아웃 개선) */
+/* 🌟 배너 높이를 650px로 확 늘려서 겹침 해결 */
 .banner {
   color: white; object-fit: contain;
-  height: 650px; /* 🌟 배너 높이를 늘려 공간 확보 */
+  height: 650px;
   background-size: cover; background-position: center top; position: relative;
 }
+
 .banner-contents {
   margin-left: 40px; padding-top: 180px;
-  /* height: 230px; 고정 높이 제거 */
-  padding-bottom: 60px; /* 🌟 하단 패딩을 주어 콘텐츠와 간격 확보 */
+  padding-bottom: 60px; /* 하단 여백 확보 */
   position: relative; z-index: 10;
 }
 .banner-title {
   font-size: 3.5rem; font-weight: 800; padding-bottom: 0.3rem;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.8); margin-bottom: 10px;
 }
 .banner-meta {
   display: flex; gap: 15px; margin-bottom: 15px; font-weight: bold; font-size: 1.2rem;
@@ -193,8 +192,7 @@ onMounted(async () => {
 .banner-description {
   width: 45rem; line-height: 1.4; padding-top: 1rem;
   font-size: 1.1rem; max-width: 500px;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
-  color: #ddd;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.8); color: #ddd;
 }
 .banner-buttons { margin-bottom: 15px; }
 .banner-button {
@@ -207,52 +205,39 @@ onMounted(async () => {
 .banner-button.play:hover { background-color: #c7c7c7; }
 .banner-button.info:hover { background-color: rgba(255, 255, 255, 0.2); }
 .banner--fadeBottom {
-  height: 15rem; /* 그라데이션 높이 증가 */
+  height: 15rem;
   background-image: linear-gradient(180deg, transparent, rgba(20, 20, 20, 0.61), #141414);
   position: absolute; bottom: 0; width: 100%;
 }
 
-/* 영화 목록 스타일 및 슬라이더 버튼 추가 */
+/* 영화 목록 스타일 */
 .rows-container {
   position: relative; z-index: 20;
-  margin-top: -80px; /* 🌟 배너 위로 올라오는 정도 조정 */
+  margin-top: -80px; /* 배너랑 자연스럽게 겹치기 */
   padding-left: 20px;
 }
 .row { margin-bottom: 40px; }
 .row h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 15px; margin-left: 10px; color: #e5e5e5; }
 
-/* 🌟 슬라이더 컨테이너 (버튼 위치 기준점) */
+/* 🌟 슬라이더 컨테이너 */
 .row-slider-container { position: relative; }
 
-/* 슬라이더 화살표 버튼 스타일 */
+/* 화살표 버튼 스타일 */
 .slider-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  border: none;
-  width: 50px;
-  height: 100%; /* 포스터 높이만큼 꽉 채움 */
-  font-size: 2.5rem;
-  cursor: pointer;
-  z-index: 30;
-  opacity: 0; /* 평소엔 숨김 */
-  transition: all 0.3s;
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(0, 0, 0, 0.5); color: white; border: none;
+  width: 50px; height: 100%; font-size: 2.5rem; cursor: pointer;
+  z-index: 30; opacity: 0; transition: all 0.3s;
   display: flex; align-items: center; justify-content: center;
 }
+.row-slider-container:hover .slider-arrow { opacity: 1; }
 .slider-arrow:hover { background: rgba(0, 0, 0, 0.7); color: #E50914; }
 .slider-arrow.left { left: 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
 .slider-arrow.right { right: 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
 
-/* 마우스 올리면 버튼 표시 */
-.row-slider-container:hover .slider-arrow { opacity: 1; }
-
 .row-posters {
   display: flex; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden;
-  gap: 12px;
-  padding: 10px 60px; /* 🌟 좌우 버튼 공간만큼 패딩 추가 */
-  scroll-behavior: smooth;
+  gap: 12px; padding: 10px 60px; scroll-behavior: smooth;
 }
 .row-posters::-webkit-scrollbar { display: none; }
 .row-posters { -ms-overflow-style: none; scrollbar-width: none; }
@@ -260,7 +245,7 @@ onMounted(async () => {
 /* 스켈레톤 애니메이션 */
 @keyframes pulse { 0% { opacity: 0.3; background-color: #333; } 50% { opacity: 0.5; background-color: #444; } 100% { opacity: 0.3; background-color: #333; } }
 .loading-skeleton { padding: 0; width: 100%; overflow: hidden; }
-.skeleton-banner { width: 100%; height: 650px; /* 배너 높이와 맞춤 */ margin-bottom: 20px; animation: pulse 1.5s infinite ease-in-out; }
+.skeleton-banner { width: 100%; height: 650px; margin-bottom: 20px; animation: pulse 1.5s infinite ease-in-out; }
 .skeleton-row-container { margin: 20px 0 40px 20px; }
 .skeleton-title { width: 200px; height: 30px; margin-bottom: 15px; border-radius: 4px; animation: pulse 1.5s infinite ease-in-out; }
 .skeleton-posters { display: flex; gap: 10px; overflow: hidden; padding: 0 60px; }
