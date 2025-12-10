@@ -10,7 +10,8 @@
             placeholder="영화 제목을 입력해보세요"
             type="text"
         />
-        <button @click="handleSearch" class="search-btn">🔍</button>
+        <button @click="handleSearch" class="search-btn">
+          <i class="fas fa-search"></i> </button>
       </div>
 
       <div v-if="searchHistory.length > 0" class="history-container">
