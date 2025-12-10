@@ -38,35 +38,68 @@
       </header>
 
       <div class="rows-container">
+
         <div class="row">
           <h2>🔥 지금 뜨는 콘텐츠</h2>
-          <div class="row-posters">
-            <MovieCard v-for="movie in popularMovies" :key="movie.id" :movie="movie"
-                       :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+          <div class="row-slider-container">
+            <button class="slider-arrow left" @click="scrollRow('left', $event)">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="row-posters">
+              <MovieCard v-for="movie in popularMovies" :key="movie.id" :movie="movie"
+                         :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+            </div>
+            <button class="slider-arrow right" @click="scrollRow('right', $event)">
+              <i class="fas fa-chevron-right"></i>
+            </button>
           </div>
         </div>
 
         <div class="row">
           <h2>🎬 최신 상영작</h2>
-          <div class="row-posters">
-            <MovieCard v-for="movie in nowPlayingMovies" :key="movie.id" :movie="movie"
-                       :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+          <div class="row-slider-container">
+            <button class="slider-arrow left" @click="scrollRow('left', $event)">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="row-posters">
+              <MovieCard v-for="movie in nowPlayingMovies" :key="movie.id" :movie="movie"
+                         :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+            </div>
+            <button class="slider-arrow right" @click="scrollRow('right', $event)">
+              <i class="fas fa-chevron-right"></i>
+            </button>
           </div>
         </div>
 
         <div class="row">
           <h2>⭐ 평론가 호평 영화</h2>
-          <div class="row-posters">
-            <MovieCard v-for="movie in topRatedMovies" :key="movie.id" :movie="movie"
-                       :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+          <div class="row-slider-container">
+            <button class="slider-arrow left" @click="scrollRow('left', $event)">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="row-posters">
+              <MovieCard v-for="movie in topRatedMovies" :key="movie.id" :movie="movie"
+                         :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+            </div>
+            <button class="slider-arrow right" @click="scrollRow('right', $event)">
+              <i class="fas fa-chevron-right"></i>
+            </button>
           </div>
         </div>
 
         <div class="row">
           <h2>💥 액션 영화</h2>
-          <div class="row-posters">
-            <MovieCard v-for="movie in actionMovies" :key="movie.id" :movie="movie"
-                       :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+          <div class="row-slider-container">
+            <button class="slider-arrow left" @click="scrollRow('left', $event)">
+              <i class="fas fa-chevron-left"></i>
+            </button>
+            <div class="row-posters">
+              <MovieCard v-for="movie in actionMovies" :key="movie.id" :movie="movie"
+                         :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+            </div>
+            <button class="slider-arrow right" @click="scrollRow('right', $event)">
+              <i class="fas fa-chevron-right"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -76,7 +109,6 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-// 4개의 API 함수 호출 (과제 필수 요건 충족)
 import { fetchPopularMovies, fetchNowPlaying, fetchTopRated, fetchActionMovies, getImageUrl } from '@/api/tmdb';
 import MovieCard from '@/components/movie/MovieCard.vue';
 import { useWishlist } from '@/composables/useWishlist';
@@ -90,14 +122,26 @@ const isLoading = ref(true);
 
 const { isWished, toggleWishlist, loadWishlist } = useWishlist();
 
-// 설명 글자수 자르기 함수
 const truncate = (str, n) => str?.length > n ? str.substr(0, n - 1) + "..." : str;
+
+// 🌟 [추가] 가로 스크롤 함수
+const scrollRow = (direction, event) => {
+  const sliderContainer = event.target.closest('.row-slider-container');
+  const rowPosters = sliderContainer.querySelector('.row-posters');
+
+  if (rowPosters) {
+    const scrollAmount = window.innerWidth * 0.7; // 화면의 70%만큼 이동
+    rowPosters.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
+      behavior: 'smooth'
+    });
+  }
+};
 
 onMounted(async () => {
   loadWishlist();
   isLoading.value = true;
   try {
-    // API 병렬 호출
     const [popRes, nowRes, topRes, actRes] = await Promise.all([
       fetchPopularMovies(),
       fetchNowPlaying(),
@@ -109,8 +153,6 @@ onMounted(async () => {
     nowPlayingMovies.value = nowRes.data.results;
     topRatedMovies.value = topRes.data.results;
     actionMovies.value = actRes.data.results;
-
-    // 배너 영화 설정 (인기 영화 중 첫 번째)
     bannerMovie.value = popRes.data.results[0];
   } catch (error) {
     console.error("영화 로딩 실패:", error);
@@ -123,13 +165,15 @@ onMounted(async () => {
 <style scoped>
 .home { background-color: #141414; min-height: 100vh; color: white; padding-bottom: 50px; }
 
-/* 배너 스타일 */
+/* 🌟 배너 높이 650px로 고정 (글자 겹침 해결) */
 .banner {
-  color: white; object-fit: contain; height: 550px; /* 높이 조정 */
+  color: white; object-fit: contain;
+  height: 650px;
   background-size: cover; background-position: center top; position: relative;
 }
 .banner-contents {
-  margin-left: 40px; padding-top: 180px; height: 230px;
+  margin-left: 40px; padding-top: 200px;
+  padding-bottom: 60px;
   position: relative; z-index: 10;
 }
 .banner-title {
@@ -137,13 +181,11 @@ onMounted(async () => {
   text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
   margin-bottom: 10px;
 }
-
-/* 🌟 배너 메타 정보 (평점, 연도) 스타일 */
 .banner-meta {
   display: flex; gap: 15px; margin-bottom: 15px; font-weight: bold; font-size: 1.2rem;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
 }
-.meta-rating { color: #46d369; /* 넷플릭스 일치율 색상 (초록) */ }
+.meta-rating { color: #46d369; }
 .meta-year { color: #aaa; }
 
 .banner-description {
@@ -164,19 +206,48 @@ onMounted(async () => {
 .banner-button.info:hover { background-color: rgba(255, 255, 255, 0.2); }
 
 .banner--fadeBottom {
-  height: 10rem;
+  height: 15rem;
   background-image: linear-gradient(180deg, transparent, rgba(20, 20, 20, 0.61), #141414);
   position: absolute; bottom: 0; width: 100%;
 }
 
 /* 영화 목록 스타일 */
-.rows-container { position: relative; z-index: 20; margin-top: -60px; padding-left: 20px; }
+.rows-container {
+  position: relative; z-index: 20;
+  margin-top: -80px; /* 배너 위로 살짝 올라옴 */
+  padding-left: 20px;
+}
 .row { margin-bottom: 40px; }
 .row h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 15px; margin-left: 10px; color: #e5e5e5; }
 
+/* 🌟 슬라이더 & 화살표 버튼 스타일 (추가됨) */
+.row-slider-container { position: relative; }
+
+.slider-arrow {
+  position: absolute; top: 0; bottom: 0; margin: auto;
+  background: rgba(0, 0, 0, 0.5);
+  color: white; border: none;
+  width: 50px; height: 100%;
+  font-size: 2.5rem; cursor: pointer;
+  z-index: 50;
+  opacity: 0; /* 평소엔 숨김 */
+  transition: all 0.3s;
+  display: flex; align-items: center; justify-content: center;
+}
+.row-slider-container:hover .slider-arrow { opacity: 1; } /* 마우스 올리면 보임 */
+
+.slider-arrow:hover {
+  background: rgba(0, 0, 0, 0.8);
+  color: #E50914;
+  transform: scale(1.1);
+}
+.slider-arrow.left { left: 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
+.slider-arrow.right { right: 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
+
 .row-posters {
   display: flex; flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden;
-  gap: 12px; padding: 10px; scroll-behavior: smooth;
+  gap: 10px; padding: 10px 60px; /* 화살표 공간 확보 */
+  scroll-behavior: smooth;
 }
 .row-posters::-webkit-scrollbar { display: none; }
 .row-posters { -ms-overflow-style: none; scrollbar-width: none; }
@@ -188,9 +259,9 @@ onMounted(async () => {
   100% { opacity: 0.3; background-color: #333; }
 }
 .loading-skeleton { padding: 0; width: 100%; overflow: hidden; }
-.skeleton-banner { width: 100%; height: 550px; margin-bottom: 20px; animation: pulse 1.5s infinite ease-in-out; }
+.skeleton-banner { width: 100%; height: 650px; margin-bottom: 20px; animation: pulse 1.5s infinite ease-in-out; }
 .skeleton-row-container { margin: 20px 0 40px 20px; }
 .skeleton-title { width: 200px; height: 30px; margin-bottom: 15px; border-radius: 4px; animation: pulse 1.5s infinite ease-in-out; }
-.skeleton-posters { display: flex; gap: 10px; overflow: hidden; }
+.skeleton-posters { display: flex; gap: 10px; overflow: hidden; padding: 0 60px; }
 .skeleton-poster { width: 160px; height: 240px; border-radius: 4px; flex-shrink: 0; animation: pulse 1.5s infinite ease-in-out; }
 </style>
