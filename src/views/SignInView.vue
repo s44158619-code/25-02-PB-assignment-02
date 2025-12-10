@@ -69,15 +69,13 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
-const isLoginMode = ref(true); // true: 로그인, false: 회원가입
+const isLoginMode = ref(true);
 
-// 입력 데이터
 const email = ref('');
 const password = ref('');
 const confirmPassword = ref('');
 const rememberMe = ref(false);
 
-// 모드 전환 함수
 const toggleMode = () => {
   isLoginMode.value = !isLoginMode.value;
   email.value = '';
@@ -85,7 +83,6 @@ const toggleMode = () => {
   confirmPassword.value = '';
 };
 
-// 폼 제출 처리
 const handleSubmit = () => {
   if (isLoginMode.value) {
     handleLogin();
@@ -94,7 +91,6 @@ const handleSubmit = () => {
   }
 };
 
-// 로그인 로직
 const handleLogin = () => {
   const users = JSON.parse(localStorage.getItem('users') || '[]');
   const user = users.find(u => u.email === email.value && u.password === password.value);
@@ -109,7 +105,6 @@ const handleLogin = () => {
   }
 };
 
-// 회원가입 로직
 const handleRegister = () => {
   if (password.value !== confirmPassword.value) {
     alert('비밀번호가 일치하지 않습니다.');
@@ -151,8 +146,7 @@ const handleRegister = () => {
 }
 
 .background-overlay {
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
   background: rgba(0, 0, 0, 0.5);
   z-index: 1;
 }
@@ -166,7 +160,6 @@ const handleRegister = () => {
   width: 100%;
   max-width: 450px;
   min-height: 550px;
-  overflow: hidden; /* 애니메이션 넘침 방지 */
 }
 
 .card-title {
@@ -175,42 +168,62 @@ const handleRegister = () => {
 
 .input-group { margin-bottom: 16px; }
 
+/* 🌟 입력창 스타일 (포커스 효과 추가) */
 input {
   width: 100%; height: 50px; line-height: 50px; padding: 16px 20px;
-  border: 0; border-radius: 4px; background: #333; color: white;
+  border: 1px solid #333; border-radius: 4px; background: #333; color: white;
   font-size: 16px; box-sizing: border-box;
+  transition: all 0.3s ease; /* 부드러운 전환 */
 }
-input:focus { outline: none; background: #454545; }
 
+input:focus {
+  outline: none;
+  background: #454545;
+  border-bottom: 2px solid #E50914; /* 넷플릭스 레드 포인트 */
+  box-shadow: 0 0 8px rgba(229, 9, 20, 0.3); /* 살짝 빛나게 */
+}
+
+/* 🌟 버튼 스타일 (호버 & 클릭 효과 추가) */
 .submit-btn {
   width: 100%; padding: 16px; font-size: 16px; font-weight: 700;
   margin-top: 24px; background-color: #E50914; color: white;
-  border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.2s;
+  border: none; border-radius: 4px; cursor: pointer;
+  transition: all 0.2s ease; /* 애니메이션 필수 */
+  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
 }
-.submit-btn:hover { background-color: #f40612; }
+
+.submit-btn:hover {
+  background-color: #f40612;
+  transform: scale(1.02); /* 살짝 커짐 */
+}
+
+.submit-btn:active {
+  transform: scale(0.95); /* 클릭 시 꾹 눌림 */
+  background-color: #b2070f;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
 
 .form-help {
   display: flex; justify-content: space-between; margin-top: 10px;
   color: #b3b3b3; font-size: 13px;
 }
 
+/* 🌟 링크 텍스트 효과 */
 .switch-mode { margin-top: 40px; color: #737373; font-size: 16px; }
-.switch-link { color: white; margin-left: 5px; cursor: pointer; }
-.switch-link:hover { text-decoration: underline; }
+.switch-link {
+  color: white; margin-left: 5px; cursor: pointer;
+  transition: color 0.3s;
+}
+.switch-link:hover {
+  text-decoration: underline;
+  color: #E50914; /* 마우스 올리면 빨간색 */
+}
 
-/* 🌟 전환 애니메이션 CSS (필수) */
+/* 전환 애니메이션 */
 .fade-slide-enter-active,
 .fade-slide-leave-active {
   transition: all 0.4s ease;
 }
-
-.fade-slide-enter-from {
-  opacity: 0;
-  transform: translateX(20px); /* 오른쪽에서 스윽 */
-}
-
-.fade-slide-leave-to {
-  opacity: 0;
-  transform: translateX(-20px); /* 왼쪽으로 스윽 */
-}
+.fade-slide-enter-from { opacity: 0; transform: translateX(20px); }
+.fade-slide-leave-to { opacity: 0; transform: translateX(-20px); }
 </style>
