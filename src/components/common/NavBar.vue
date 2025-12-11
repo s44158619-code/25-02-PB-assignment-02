@@ -33,7 +33,6 @@ const isScrolled = ref(false);
 const isLoggedIn = ref(false);
 const userEmail = ref('');
 
-// 스크롤이 50px 이상 내려가면 isScrolled를 true로 설정
 const handleScroll = () => isScrolled.value = window.scrollY > 50;
 
 const checkLoginStatus = () => {
@@ -70,34 +69,29 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll));
 .navbar {
   position: fixed;
   top: 0;
+  left: 0; /* 🌟 왼쪽 끝 고정 */
   width: 100%;
   height: 70px;
-  z-index: 100;
-  /* 배경색과 블러 효과가 부드럽게 전환되도록 설정 */
+  z-index: 1000; /* 🌟 다른 요소보다 무조건 위에 */
   transition: all 0.4s ease;
-  /* 초기 상태: 상단이 어두운 그라데이션 (배너와 자연스럽게 섞임) */
   background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+  box-sizing: border-box; /* 🌟 패딩 포함해서 너비 계산 */
 }
 
-/* 🌟 [핵심 수정] 스크롤 내렸을 때 적용되는 스타일 */
 .navbar.scrolled {
-  /* 1. 반투명한 검은색 배경 */
-  background-color: rgba(20, 20, 20, 0.85);
-  /* 2. 배경 블러 효과 (유리창처럼 뒷배경을 흐리게 만듦) */
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px); /* 사파리 브라우저 호환 */
-  /* 3. 살짝 그림자를 주어 입체감 추가 */
+  background-color: rgba(20, 20, 20, 0.95); /* 조금 더 진하게 */
+  backdrop-filter: blur(10px);
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .nav-content {
   width: 100%;
-  padding: 0 4%;
+  height: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  height: 100%;
+  padding: 0 50px; /* 🌟 양옆 여백 넉넉하게 확보 (중요!) */
+  box-sizing: border-box;
 }
 
 .left-section { display: flex; align-items: center; }
@@ -106,9 +100,9 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll));
   color: #E50914;
   font-size: 28px;
   font-weight: bold;
-  margin-right: 25px;
+  margin-right: 30px;
   text-decoration: none;
-  text-shadow: 0 0 10px rgba(229, 9, 20, 0.3); /* 로고 발광 효과 */
+  text-shadow: 0 0 10px rgba(229, 9, 20, 0.3);
 }
 
 .menu-links { display: flex; gap: 20px; }
@@ -116,36 +110,39 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll));
 .menu-links a {
   color: #e5e5e5;
   text-decoration: none;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   transition: color 0.3s;
   white-space: nowrap;
 }
 .menu-links a:hover { color: #b3b3b3; }
-.menu-links a.router-link-active {
-  color: white;
-  font-weight: bold;
-}
+.menu-links a.router-link-active { color: white; font-weight: bold; }
 
 .right-section { display: flex; align-items: center; }
-.user-menu { display: flex; align-items: center; gap: 15px; }
+
+.user-menu {
+  display: flex;
+  align-items: center;
+  gap: 20px; /* 🌟 이메일과 로그아웃 버튼 사이 간격 */
+}
 
 .user-email {
   color: white;
   font-size: 14px;
-  max-width: 150px;
+  max-width: 200px; /* 🌟 이메일 표시 공간 확보 */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  text-align: right;
 }
 
 .login-btn, .logout-btn {
   background-color: #E50914;
   color: white;
-  padding: 7px 15px;
+  padding: 8px 16px;
   border-radius: 4px;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: bold;
   border: none;
   cursor: pointer;
@@ -154,5 +151,13 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll));
 }
 .login-btn:hover, .logout-btn:hover {
   background-color: #f40612;
+}
+
+/* 모바일 대응 (화면 작아지면 여백 줄임) */
+@media (max-width: 768px) {
+  .nav-content { padding: 0 20px; }
+  .logo { font-size: 20px; margin-right: 15px; }
+  .menu-links { gap: 10px; }
+  .menu-links a { font-size: 12px; }
 }
 </style>
