@@ -119,9 +119,19 @@ src/
 
 🚀 설치 및 실행 (How to Run)
 1. 프로젝트 클론
-git clone [https://github.com/s44158619-code/25-02-PB-assignment-02.git](https://github.com/s44158619-code/25-02-PB-assignment-02.git)
+Bash
+
+git clone https://github.com/s44158619-code/25-02-PB-assignment-02.git
 cd 25-02-PB-assignment-02
 2. 의존성 설치
+주의: node_modules 폴더가 없으므로 반드시 설치해야 합니다.
+
+Bash
+
 npm install
 3. 개발 서버 실행
+Bash
+
 npm run dev
+4. 배포 (Deployment)
+GitHub Actions를 통해 main 브랜치 푸시 시 자동 배포됩니다.
