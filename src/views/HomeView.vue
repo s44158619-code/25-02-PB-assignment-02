@@ -12,7 +12,6 @@
     </div>
 
     <div v-else>
-
       <div class="hero-slider">
         <div
             v-for="(movie, index) in bannerMovies"
@@ -55,7 +54,6 @@
       </div>
 
       <div class="rows-container">
-
         <div class="row">
           <h2>🔥 지금 뜨는 콘텐츠</h2>
           <div class="row-slider-container">
@@ -118,46 +116,31 @@ const popularMovies = ref([]);
 const nowPlayingMovies = ref([]);
 const topRatedMovies = ref([]);
 const actionMovies = ref([]);
-
-// 🌟 슬라이더용 변수
-const bannerMovies = ref([]); // 상단 배너에 쓸 영화 5개
+const bannerMovies = ref([]);
 const currentSlide = ref(0);
 const slideInterval = ref(null);
-
 const isLoading = ref(true);
 
 const { isWished, toggleWishlist, loadWishlist } = useWishlist();
 const truncate = (str, n) => str?.length > n ? str.substr(0, n - 1) + "..." : str;
 
-// 가로 스크롤 함수
 const scrollRow = (direction, event) => {
   const sliderContainer = event.target.closest('.row-slider-container');
   const rowPosters = sliderContainer.querySelector('.row-posters');
   if (rowPosters) {
     const scrollAmount = window.innerWidth * 0.7;
-    rowPosters.scrollBy({
-      left: direction === 'left' ? -scrollAmount : scrollAmount,
-      behavior: 'smooth'
-    });
+    rowPosters.scrollBy({ left: direction === 'left' ? -scrollAmount : scrollAmount, behavior: 'smooth' });
   }
 };
 
-// 🌟 슬라이드 타이머 로직
 const startSlideTimer = () => {
   slideInterval.value = setInterval(() => {
     currentSlide.value = (currentSlide.value + 1) % bannerMovies.value.length;
-  }, 5000); // 5초마다 변경
+  }, 5000);
 };
 
-const stopSlideTimer = () => {
-  if (slideInterval.value) clearInterval(slideInterval.value);
-};
-
-const setSlide = (index) => {
-  stopSlideTimer(); // 사용자가 클릭하면 타이머 잠깐 멈췄다가
-  currentSlide.value = index;
-  startSlideTimer(); // 다시 시작
-};
+const stopSlideTimer = () => { if (slideInterval.value) clearInterval(slideInterval.value); };
+const setSlide = (index) => { stopSlideTimer(); currentSlide.value = index; startSlideTimer(); };
 
 onMounted(async () => {
   loadWishlist();
@@ -166,122 +149,49 @@ onMounted(async () => {
     const [popRes, nowRes, topRes, actRes] = await Promise.all([
       fetchPopularMovies(), fetchNowPlaying(), fetchTopRated(), fetchActionMovies()
     ]);
-
     popularMovies.value = popRes.data.results;
     nowPlayingMovies.value = nowRes.data.results;
     topRatedMovies.value = topRes.data.results;
     actionMovies.value = actRes.data.results;
-
-    // 🌟 인기 영화 중 상위 5개를 배너로 사용
     bannerMovies.value = popRes.data.results.slice(0, 5);
-
-    // 슬라이드 시작
     startSlideTimer();
-
-  } catch (error) {
-    console.error(error);
-  } finally {
-    isLoading.value = false;
-  }
+  } catch (error) { console.error(error); } finally { isLoading.value = false; }
 });
 
-onUnmounted(() => {
-  stopSlideTimer(); // 페이지 나가면 타이머 종료
-});
+onUnmounted(() => { stopSlideTimer(); });
 </script>
 
 <style scoped>
-.home { background-color: #141414; min-height: 100vh; color: white; padding-bottom: 50px; }
+.home { background-color: #141414; min-height: 100vh; color: white; padding-bottom: 50px; overflow-x: hidden; }
 
-/* 🌟 히어로 슬라이더 컨테이너 */
-.hero-slider {
-  position: relative;
-  width: 100%;
-  height: 750px; /* 높이 넉넉하게 */
-  overflow: hidden;
-  background: black;
-}
+/* 🌟 히어로 슬라이더 */
+.hero-slider { position: relative; width: 100%; height: 750px; overflow: hidden; background: black; }
+.slide-item { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center top; opacity: 0; transition: opacity 1s ease-in-out; z-index: 1; }
+.slide-item.active { opacity: 1; z-index: 2; }
 
-/* 개별 슬라이드 (겹쳐놓고 투명도만 조절) */
-.slide-item {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  background-size: cover; background-position: center top;
-  opacity: 0; /* 기본적으로 안 보임 */
-  transition: opacity 1s ease-in-out; /* 부드러운 전환 효과 */
-  z-index: 1;
-}
-
-.slide-item.active {
-  opacity: 1; /* 활성화된 슬라이드만 보임 */
-  z-index: 2;
-}
-
-.banner-contents {
-  margin-left: 40px; padding-top: 250px;
-  padding-bottom: 60px;
-  position: relative; z-index: 10;
-}
-.banner-title {
-  font-size: 3.5rem; font-weight: 800; padding-bottom: 0.3rem;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.8); margin-bottom: 10px;
-}
+.banner-contents { margin-left: 40px; padding-top: 250px; padding-bottom: 60px; position: relative; z-index: 10; }
+.banner-title { font-size: 3.5rem; font-weight: 800; padding-bottom: 0.3rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); margin-bottom: 10px; }
 .banner-meta { display: flex; gap: 15px; margin-bottom: 15px; font-weight: bold; font-size: 1.2rem; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); }
 .meta-rating { color: #46d369; }
 .meta-year { color: #aaa; }
-.banner-description {
-  width: 45rem; line-height: 1.4; padding-top: 1rem;
-  font-size: 1.1rem; max-width: 500px;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.8); color: #ddd;
-}
+.banner-description { width: 45rem; line-height: 1.4; padding-top: 1rem; font-size: 1.1rem; max-width: 500px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); color: #ddd; }
 .banner-buttons { margin-bottom: 15px; }
-.banner-button {
-  cursor: pointer; color: #fff; outline: none; border: none; font-weight: 700; border-radius: 4px; padding: 0.6rem 2.5rem; margin-right: 1rem; background-color: rgba(51, 51, 51, 0.7); font-size: 1.1rem; transition: all 0.2s;
-}
+.banner-button { cursor: pointer; color: #fff; outline: none; border: none; font-weight: 700; border-radius: 4px; padding: 0.6rem 2.5rem; margin-right: 1rem; background-color: rgba(51, 51, 51, 0.7); font-size: 1.1rem; transition: all 0.2s; }
 .banner-button.play { background-color: white; color: black; }
 .banner-button.play:hover { background-color: #c7c7c7; }
 .banner-button.info:hover { background-color: rgba(255, 255, 255, 0.2); }
+.banner--fadeBottom { height: 20rem; background-image: linear-gradient(180deg, transparent, rgba(20, 20, 20, 0.61), #141414); position: absolute; bottom: 0; width: 100%; }
 
-.banner--fadeBottom {
-  height: 20rem;
-  background-image: linear-gradient(180deg, transparent, rgba(20, 20, 20, 0.61), #141414);
-  position: absolute; bottom: 0; width: 100%;
-}
+.slider-indicators { position: absolute; bottom: 120px; right: 50px; display: flex; gap: 10px; z-index: 20; }
+.indicator-dot { width: 12px; height: 12px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; cursor: pointer; transition: all 0.3s; }
+.indicator-dot.active { background: white; transform: scale(1.2); }
 
-/* 🌟 슬라이더 인디케이터 (하단 점) */
-.slider-indicators {
-  position: absolute;
-  bottom: 120px; /* 위치 조정 */
-  right: 50px;
-  display: flex;
-  gap: 10px;
-  z-index: 20;
-}
-.indicator-dot {
-  width: 12px; height: 12px;
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-.indicator-dot.active {
-  background: white;
-  transform: scale(1.2);
-}
-
-/* 영화 목록 스타일 */
+/* 🌟 영화 목록 (가로 스크롤) */
 .rows-container { position: relative; z-index: 20; margin-top: -100px; padding-left: 20px; }
 .row { margin-bottom: 40px; }
 .row h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 15px; margin-left: 10px; color: #e5e5e5; }
 .row-slider-container { position: relative; }
-.slider-arrow {
-  position: absolute; top: 0; bottom: 0; margin: auto;
-  background: rgba(0, 0, 0, 0.5); color: white; border: none;
-  width: 50px; height: 100%; font-size: 2.5rem; cursor: pointer;
-  z-index: 50; opacity: 0.5; transition: all 0.3s;
-  display: flex; align-items: center; justify-content: center;
-}
+.slider-arrow { position: absolute; top: 0; bottom: 0; margin: auto; background: rgba(0, 0, 0, 0.5); color: white; border: none; width: 50px; height: 100%; font-size: 2.5rem; cursor: pointer; z-index: 50; opacity: 0.5; transition: all 0.3s; display: flex; align-items: center; justify-content: center; }
 .slider-arrow:hover { background: rgba(0, 0, 0, 0.8); color: #E50914; opacity: 1; transform: scale(1.1); }
 .slider-arrow.left { left: 0; border-top-right-radius: 4px; border-bottom-right-radius: 4px; }
 .slider-arrow.right { right: 0; border-top-left-radius: 4px; border-bottom-left-radius: 4px; }
@@ -289,10 +199,30 @@ onUnmounted(() => {
 .row-posters::-webkit-scrollbar { display: none; }
 .row-posters { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* 스켈레톤 */
+/* 📱 [모바일 반응형 핵심 스타일] */
+@media (max-width: 768px) {
+  /* 1. 배너 높이 및 레이아웃 축소 */
+  .hero-slider, .skeleton-banner { height: 500px !important; }
+  .banner-contents { padding-top: 150px; margin-left: 20px; padding-bottom: 40px; }
+
+  /* 2. 폰트 크기 줄임 */
+  .banner-title { font-size: 2rem; }
+  .banner-description { width: auto; max-width: 300px; font-size: 0.9rem; /* 글자수 제한(3줄) */ display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .banner-button { padding: 0.5rem 1.5rem; font-size: 0.9rem; }
+
+  /* 3. 인디케이터 위치 조정 */
+  .slider-indicators { bottom: 20px; right: 20px; }
+
+  /* 4. 리스트 여백 조정 및 화살표 제거 */
+  .rows-container { margin-top: -50px; padding-left: 10px; }
+  .row-posters { padding: 10px 10px; }
+  .slider-arrow { display: none !important; } /* 모바일에선 화살표 숨김 (터치 스크롤 사용) */
+  .row h2 { font-size: 1.2rem; margin-left: 5px; }
+}
+
+/* 스켈레톤 애니메이션 */
 @keyframes pulse { 0% { opacity: 0.3; background: #333; } 50% { opacity: 0.5; background: #444; } 100% { opacity: 0.3; background: #333; } }
 .loading-skeleton { padding: 0; width: 100%; overflow: hidden; }
-.skeleton-banner { width: 100%; height: 750px; margin-bottom: 20px; animation: pulse 1.5s infinite; }
 .skeleton-row-container { margin: 20px 0 40px 20px; }
 .skeleton-title { width: 200px; height: 30px; margin-bottom: 15px; border-radius: 4px; animation: pulse 1.5s infinite; }
 .skeleton-posters { display: flex; gap: 10px; overflow: hidden; padding: 0 60px; }
