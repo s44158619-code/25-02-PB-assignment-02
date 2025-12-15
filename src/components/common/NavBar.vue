@@ -6,7 +6,7 @@
 
         <div class="menu-links" v-if="isLoggedIn">
           <RouterLink to="/">홈</RouterLink>
-          <RouterLink to="/popular">대세</RouterLink>
+          <RouterLink to="/popular">대세 컨텐츠</RouterLink>
           <RouterLink to="/search">검색</RouterLink>
           <RouterLink to="/wishlist">찜</RouterLink>
         </div>
