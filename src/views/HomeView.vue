@@ -1,6 +1,5 @@
 ﻿<template>
   <div class="home">
-
     <div v-if="isLoading" class="loading-skeleton">
       <div class="skeleton-banner"></div>
       <div class="skeleton-row-container" v-for="n in 3" :key="n">
@@ -43,13 +42,7 @@
         </div>
 
         <div class="slider-indicators">
-          <span
-              v-for="(movie, index) in bannerMovies"
-              :key="index"
-              class="indicator-dot"
-              :class="{ active: index === currentSlide }"
-              @click="setSlide(index)"
-          ></span>
+          <span v-for="(movie, index) in bannerMovies" :key="index" class="indicator-dot" :class="{ active: index === currentSlide }" @click="setSlide(index)"></span>
         </div>
       </div>
 
@@ -59,8 +52,7 @@
           <div class="row-slider-container">
             <button class="slider-arrow left" @click="scrollRow('left', $event)"><i class="fas fa-chevron-left"></i></button>
             <div class="row-posters">
-              <MovieCard v-for="movie in popularMovies" :key="movie.id" :movie="movie"
-                         :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+              <MovieCard v-for="movie in popularMovies" :key="movie.id" :movie="movie" :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
             </div>
             <button class="slider-arrow right" @click="scrollRow('right', $event)"><i class="fas fa-chevron-right"></i></button>
           </div>
@@ -71,8 +63,7 @@
           <div class="row-slider-container">
             <button class="slider-arrow left" @click="scrollRow('left', $event)"><i class="fas fa-chevron-left"></i></button>
             <div class="row-posters">
-              <MovieCard v-for="movie in nowPlayingMovies" :key="movie.id" :movie="movie"
-                         :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+              <MovieCard v-for="movie in nowPlayingMovies" :key="movie.id" :movie="movie" :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
             </div>
             <button class="slider-arrow right" @click="scrollRow('right', $event)"><i class="fas fa-chevron-right"></i></button>
           </div>
@@ -83,8 +74,7 @@
           <div class="row-slider-container">
             <button class="slider-arrow left" @click="scrollRow('left', $event)"><i class="fas fa-chevron-left"></i></button>
             <div class="row-posters">
-              <MovieCard v-for="movie in topRatedMovies" :key="movie.id" :movie="movie"
-                         :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+              <MovieCard v-for="movie in topRatedMovies" :key="movie.id" :movie="movie" :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
             </div>
             <button class="slider-arrow right" @click="scrollRow('right', $event)"><i class="fas fa-chevron-right"></i></button>
           </div>
@@ -95,8 +85,7 @@
           <div class="row-slider-container">
             <button class="slider-arrow left" @click="scrollRow('left', $event)"><i class="fas fa-chevron-left"></i></button>
             <div class="row-posters">
-              <MovieCard v-for="movie in actionMovies" :key="movie.id" :movie="movie"
-                         :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
+              <MovieCard v-for="movie in actionMovies" :key="movie.id" :movie="movie" :isWished="isWished(movie)" @toggle-wish="toggleWishlist" />
             </div>
             <button class="slider-arrow right" @click="scrollRow('right', $event)"><i class="fas fa-chevron-right"></i></button>
           </div>
@@ -164,7 +153,7 @@ onUnmounted(() => { stopSlideTimer(); });
 <style scoped>
 .home { background-color: #141414; min-height: 100vh; color: white; padding-bottom: 50px; overflow-x: hidden; }
 
-/* 🌟 히어로 슬라이더 */
+/* 🌟 히어로 슬라이더 (PC) */
 .hero-slider { position: relative; width: 100%; height: 750px; overflow: hidden; background: black; }
 .slide-item { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center top; opacity: 0; transition: opacity 1s ease-in-out; z-index: 1; }
 .slide-item.active { opacity: 1; z-index: 2; }
@@ -186,7 +175,7 @@ onUnmounted(() => { stopSlideTimer(); });
 .indicator-dot { width: 12px; height: 12px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; cursor: pointer; transition: all 0.3s; }
 .indicator-dot.active { background: white; transform: scale(1.2); }
 
-/* 🌟 영화 목록 (가로 스크롤) */
+/* 영화 목록 스타일 */
 .rows-container { position: relative; z-index: 20; margin-top: -100px; padding-left: 20px; }
 .row { margin-bottom: 40px; }
 .row h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 15px; margin-left: 10px; color: #e5e5e5; }
@@ -199,32 +188,37 @@ onUnmounted(() => { stopSlideTimer(); });
 .row-posters::-webkit-scrollbar { display: none; }
 .row-posters { -ms-overflow-style: none; scrollbar-width: none; }
 
-/* 📱 [모바일 반응형 핵심 스타일] */
-@media (max-width: 768px) {
-  /* 1. 배너 높이 및 레이아웃 축소 */
-  .hero-slider, .skeleton-banner { height: 500px !important; }
-  .banner-contents { padding-top: 150px; margin-left: 20px; padding-bottom: 40px; }
-
-  /* 2. 폰트 크기 줄임 */
-  .banner-title { font-size: 2rem; }
-  .banner-description { width: auto; max-width: 300px; font-size: 0.9rem; /* 글자수 제한(3줄) */ display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-  .banner-button { padding: 0.5rem 1.5rem; font-size: 0.9rem; }
-
-  /* 3. 인디케이터 위치 조정 */
-  .slider-indicators { bottom: 20px; right: 20px; }
-
-  /* 4. 리스트 여백 조정 및 화살표 제거 */
-  .rows-container { margin-top: -50px; padding-left: 10px; }
-  .row-posters { padding: 10px 10px; }
-  .slider-arrow { display: none !important; } /* 모바일에선 화살표 숨김 (터치 스크롤 사용) */
-  .row h2 { font-size: 1.2rem; margin-left: 5px; }
-}
-
-/* 스켈레톤 애니메이션 */
+/* 스켈레톤 */
 @keyframes pulse { 0% { opacity: 0.3; background: #333; } 50% { opacity: 0.5; background: #444; } 100% { opacity: 0.3; background: #333; } }
 .loading-skeleton { padding: 0; width: 100%; overflow: hidden; }
+.skeleton-banner { width: 100%; height: 750px; margin-bottom: 20px; animation: pulse 1.5s infinite; }
 .skeleton-row-container { margin: 20px 0 40px 20px; }
 .skeleton-title { width: 200px; height: 30px; margin-bottom: 15px; border-radius: 4px; animation: pulse 1.5s infinite; }
 .skeleton-posters { display: flex; gap: 10px; overflow: hidden; padding: 0 60px; }
 .skeleton-poster { width: 160px; height: 240px; border-radius: 4px; flex-shrink: 0; animation: pulse 1.5s infinite; }
+
+/* 📱 [모바일 최적화 - 작고 컴팩트하게 수정] */
+@media (max-width: 768px) {
+  /* 1. 배너 높이: 고정 px 대신 화면 비율(vh)로 변경하여 더 작게 */
+  .hero-slider, .skeleton-banner { height: 55vh !important; min-height: 400px; }
+
+  /* 2. 배너 글자 크기 축소 */
+  .banner-contents { padding-top: 100px; margin-left: 20px; padding-bottom: 20px; }
+  .banner-title { font-size: 1.8rem; margin-bottom: 5px; }
+  .banner-meta { font-size: 0.8rem; margin-bottom: 10px; }
+  .banner-description {
+    font-size: 0.8rem;
+    max-width: 280px;
+    line-height: 1.3;
+    display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  }
+  .banner-button { padding: 0.4rem 1.0rem; font-size: 0.8rem; margin-right: 0.5rem; }
+
+  /* 3. 인디케이터 위치 및 리스트 여백 */
+  .slider-indicators { bottom: 15px; right: 15px; }
+  .rows-container { margin-top: -30px; padding-left: 10px; }
+  .row h2 { font-size: 1.1rem; margin-left: 5px; margin-bottom: 8px; }
+  .row-posters { padding: 0 10px; gap: 8px; }
+  .slider-arrow { display: none !important; }
+}
 </style>
